@@ -31,4 +31,4 @@
     - name: unarchive file
       ansible.builtin.unarchive:
         src: /tmp/catalogue.zip
-        dect: /app
+        dest: /app
