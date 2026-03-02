@@ -12,8 +12,6 @@
         name: mongodb-org
         state: present
 
-    
-
     - name: allow remote collections
       ansible.builtin.replace:
         path: /etc/mongod.conf
@@ -21,11 +19,11 @@
         replace: "0.0.0.0"
 
     #- name: restart mongodb
-      #ansible.builtin.service:
-       # name: mongodb
-        #state: restarted
+    #ansible.builtin.service:
+    # name: mongodb
+    #state: restarted
 
-- name: start and enable mongodb
+    - name: start and enable mongodb
       ansible.builtin.service:
         name: mongodb
         enabled: yes
