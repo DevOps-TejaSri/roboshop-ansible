@@ -1,14 +1,15 @@
-- name: configure shipping server
-  hosts: shipping
+- name: configure payment server
+  hosts: payment
   become: yes
   tasks:
-    - name: install maven and mysql
+    - name: install python
       ansible.builtin.dnf:
         name: "{{ item }}"
         state: present
       loop:
-        - maven
-        - mysql
+        - python3
+        - gcc
+        - python3-devel
 
     - name: create system user roboshop
       ansible.builtin.user:
@@ -28,46 +29,35 @@
         path: /app
         state: directory
 
-    - name: downlod shipping
+    - name: downlod payment
       ansible.builtin.get_url:
-        url: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip
-        dest: /tmp/shipping.zip
+        url: https://roboshop-artifacts.s3.amazonaws.com/payment-v3.zip
+        dest: /tmp/payment.zip
 
     - name: unarchive file
       ansible.builtin.unarchive:
-        src: /tmp/shipping.zip
+        src: /tmp/payment.zip
         dest: /app
         remote_src: yes
 
     - name: install dependencies
-      ansible.builtin.command: mvn clean package
+      ansible.builtin.pip:
+        requirements: requirements.txt
+        executable: pip3.9
       args:
         chdir: /app
 
-    - name: create systemctl service
+    - name: copy payment service
       ansible.builtin.template:
-        src: shipping.service
-        dest: /etc/systemd/system/shipping.service
+        src: payment.service
+        dest: /etc/systemd/system/payment.service
 
     - name: daemon reload
       ansible.builtin.systemd_service:
-        daemon_reload: true
+        deamon_reload: true
 
-    - name: import shipping data
-      community.mysql.mysql_db:
-        state: import
-        name: all
-        login_host: "{{ MYSQL_HOST }}"
-        login_user: root
-        login_password: Roboshop@1
-        target: "{{ item }}"
-      loop:
-        - /app/db/schema.sql
-        - /app/db/app-user.sql
-        - /app/db/master-data.sql
-
-    - name: start and enable shipping
+    - name: start enable payment
       ansible.builtin.service:
-        name: shipping
+        name: payment
         state: restarted
         enabled: yes
