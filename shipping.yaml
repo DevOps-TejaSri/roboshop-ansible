@@ -23,6 +23,11 @@
         path: /app
         state: absent
 
+    - name: delete shipping zip file
+      ansible.builtin.file:
+        path: /tmp/shipping.zip
+        state: absent
+
     - name: create app directory
       ansible.builtin.file:
         path: /app
