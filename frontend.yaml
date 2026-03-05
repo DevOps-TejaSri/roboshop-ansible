@@ -28,7 +28,7 @@
     - name: unarchive file
       ansible.builtin.unarchive:
         src: /tmp/frontend.zip
-        dest: /app
+        dest: /usr/share/nginx/html
         remote_src: yes
 
     - name: remove defualt nginx
